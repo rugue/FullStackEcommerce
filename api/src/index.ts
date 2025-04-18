@@ -1,4 +1,5 @@
 import express from "express";
+import productsRoutes from "./routes/products/index";
 
 // const express = require("express");
 const app = express();
@@ -8,19 +9,7 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-// Products endpoints
-app.get("/products", (req, res) => {
-  res.send("the list of product!");
-});
-
-app.post("/products", (req, res) => {
-  res.send("the product has been created!");
-});
-
-app.get("/products/:id", (req, res) => {
-  console.log(req.params);
-  res.send("one product!");
-});
+app.use("/products", productsRoutes);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
