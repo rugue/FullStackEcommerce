@@ -1,11 +1,5 @@
 {
   "version": "5",
   "dialect": "postgresql",
-  "entries": [
-    {
-      "id": "0000",
-      "checksum": "NA",
-      "executedAt": "2025-04-19T20:34:52.030Z"
-    }
-  ]
+  "entries": []
 }

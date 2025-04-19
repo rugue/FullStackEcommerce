@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import { Pool } from "pg";
 
 // Use DATABASE_URL directly from process.env - Node will automatically load .env file values
 async function checkTableExists() {
@@ -15,9 +15,9 @@ async function checkTableExists() {
         AND table_name = 'products'
       );
     `);
-    
-    console.log('Products table exists:', rows[0].exists);
-    
+
+    console.log("Products table exists:", rows[0].exists);
+
     // If the table exists, also check the structure
     if (rows[0].exists) {
       const { rows: columns } = await pool.query(`
@@ -26,13 +26,12 @@ async function checkTableExists() {
         WHERE table_name = 'products'
         ORDER BY ordinal_position;
       `);
-      
-      console.log('\nTable structure:');
+
+      console.log("\nTable structure:");
       console.table(columns);
     }
-    
   } catch (error) {
-    console.error('Error checking table:', error);
+    console.error("Error checking table:", error);
   } finally {
     await pool.end();
   }
