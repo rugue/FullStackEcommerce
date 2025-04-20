@@ -14,7 +14,7 @@ export async function listProducts(req: Request, res: Response) {
 
 export async function getProductById(req: Request, res: Response) {
   try {
-    const {id} = req.params;
+    const { id } = req.params;
     const [product] = await db
       .select()
       .from(productsTable)
@@ -42,14 +42,37 @@ export async function createProduct(req: Request, res: Response) {
   }
 }
 
-export function updateProduct(req: Request, res: Response) {
+export async function updateProduct(req: Request, res: Response) {
   try {
+    const id = Number(req.params.id);
+    const updatedFields = req.body;
+
+    const [updatedProduct] = await db
+      .update(productsTable)
+      .set(updatedFields)
+      .where(eq(productsTable.id, id))
+      .returning();
+    if (updatedProduct) {
+      res.json(updatedProduct);
+    } else {
+      res.status(404).send({ message: "Product not found" });
+    }
   } catch (e) {
     res.status(500).send(e);
   }
 }
-export function deleteProduct(req: Request, res: Response) {
+export async function deleteProduct(req: Request, res: Response) {
   try {
+    const id = Number(req.params.id);
+    const [deletedProduct] = await db
+      .delete(productsTable)
+      .where(eq(productsTable.id, id))
+      .returning();
+    if (deletedProduct) {
+      res.status(204).send();
+    } else {
+      res.status(404).send({ message: "Product not found" });
+    }
   } catch (e) {
     res.status(500).send(e);
   }
