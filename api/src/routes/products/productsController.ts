@@ -1,14 +1,33 @@
 import { Request, Response } from "express";
 import { db } from "../../db";
 import { productsTable } from "../../db/productsSchema";
+import { eq } from "drizzle-orm";
 
-export function listProducts(req: Request, res: Response) {
-  res.send("listProducts");
+export async function listProducts(req: Request, res: Response) {
+  try {
+    const products = await db.select().from(productsTable);
+    res.json(products);
+  } catch (e) {
+    res.status(500).send(e);
+  }
 }
 
-export function getProductById(req: Request, res: Response) {
-  console.log(req.params);
-  res.send("getProductById");
+export async function getProductById(req: Request, res: Response) {
+  try {
+    const {id} = req.params;
+    const [product] = await db
+      .select()
+      .from(productsTable)
+      .where(eq(productsTable.id, Number(id)));
+
+    if (!product) {
+      res.status(404).send("Product not found");
+    } else {
+      res.json(product);
+    }
+  } catch (e) {
+    res.status(500).send(e);
+  }
 }
 
 export async function createProduct(req: Request, res: Response) {
@@ -18,16 +37,20 @@ export async function createProduct(req: Request, res: Response) {
       .values(req.body)
       .returning();
     res.status(201).json(product);
-    
   } catch (e) {
     res.status(500).send(e);
   }
-  
 }
 
 export function updateProduct(req: Request, res: Response) {
-  res.send("updateProduct");
+  try {
+  } catch (e) {
+    res.status(500).send(e);
+  }
 }
 export function deleteProduct(req: Request, res: Response) {
-  res.send("deleteProduct");
+  try {
+  } catch (e) {
+    res.status(500).send(e);
+  }
 }
