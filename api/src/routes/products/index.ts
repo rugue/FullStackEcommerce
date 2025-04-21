@@ -7,9 +7,11 @@ import {
   deleteProduct,
 } from "./productsController";
 import { validateData } from "../../middlewares/validationMiddleware";
-import { createProductSchema } from "../../db/productsSchema";
-
-
+import {
+  createProductSchema,
+  updateProductSchema,
+} from "../../db/productsSchema";
+// import { verifySeller, verifyToken } from "../../middlewares/authMiddleware.js";
 
 // Products endpoints
 const router = Router();
@@ -20,7 +22,7 @@ router.post("/", validateData(createProductSchema), createProduct);
 
 router.get("/:id", getProductById);
 
-router.put("/:id", updateProduct);
+router.put("/:id", validateData(updateProductSchema), updateProduct);
 
 router.delete("/:id", deleteProduct);
 
