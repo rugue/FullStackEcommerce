@@ -33,8 +33,10 @@ export async function getProductById(req: Request, res: Response) {
 
 export async function createProduct(req: Request, res: Response) {
   try {
-    const data = _.pick(req.body, Object.keys(createProductSchema.shape));
-    const [product] = await db.insert(productsTable).values(data).returning();
+    const [product] = await db
+      .insert(productsTable)
+      .values(req.cleanBody)
+      .returning();
     res.status(201).json(product);
   } catch (e) {
     res.status(500).send(e);
