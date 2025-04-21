@@ -7,18 +7,9 @@ import {
   deleteProduct,
 } from "./productsController";
 import { validateData } from "../../middlewares/validationMiddleware";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { z } from "zod";
-import { productsTable } from "../../db/productsSchema";
+import { createProductSchema } from "../../db/productsSchema";
 
-// const createProductSchema = z.object({
-//   name: z.string().min(1),
-//   description: z.string().min(1),
-//   price: z.number().positive(),
-//   imageUrl: z.string().url().optional(),
-// });
 
-const createProductSchema = createInsertSchema(productsTable);
 
 // Products endpoints
 const router = Router();
