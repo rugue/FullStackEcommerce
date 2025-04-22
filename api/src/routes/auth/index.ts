@@ -48,6 +48,7 @@ router.post("/login", validateData(loginSchema), async (req, res) => {
       res.status(401).json({ error: "Authentication failed" });
       return;
     }
+    console.log("User from DB:", user);
 
     const matched = await bcrypt.compare(password, user.password);
     if (!matched) {
@@ -62,6 +63,7 @@ router.post("/login", validateData(loginSchema), async (req, res) => {
     res.status(200).json({ token, user });
   } catch (e) {
     res.status(500).send("Something went wrong");
+    // res.status(500).json({ error: "Login failed", details: e.message });
   }
 });
 
