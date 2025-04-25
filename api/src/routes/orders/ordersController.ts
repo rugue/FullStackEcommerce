@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { db } from "../../db/index.js";
 import { orderItemsTable, ordersTable } from "../../db/ordersSchema.js";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
+import { productsTable } from "../../db/productsSchema.js";
 
 export async function createOrder(req: Request, res: Response) {
   try {
@@ -11,8 +12,20 @@ export async function createOrder(req: Request, res: Response) {
     console.log(userId);
     if (!userId) {
       res.status(400).json({ message: "Invalid order data" });
+      return;
     }
+    // Validate all product IDs exist
+    const productIds = items.map((item: any) => item.productId);
+    const products = await db
+      .select({ id: productsTable.id })
+      .from(productsTable)
+      .where(inArray(productsTable.id, productIds));
 
+    if (products.length !== productIds.length) {
+      res.status(400).json({ message: "One or more products not found" });
+      return;
+    }
+    // Validate all product IDs are unique
     const [newOrder] = await db
       .insert(ordersTable)
       // @ts-ignore
@@ -41,7 +54,26 @@ export async function createOrder(req: Request, res: Response) {
 // else, return only orders filtered by req.userId
 export async function listOrders(req: Request, res: Response) {
   try {
-    const orders = await db.select().from(ordersTable);
+    // const orders = await db.select().from(ordersTable);
+    // res.json(orders);
+    let orders;
+
+    if (req.role === "admin") {
+      // Admin sees all orders
+      orders = await db.select().from(ordersTable);
+    } else if (req.role === "seller") {
+      // Seller should see orders with their products
+      // This requires a join with orderItems and products tables
+      // For now, showing all orders until you implement seller-product relationship
+      orders = await db.select().from(ordersTable);
+    } else {
+      // Regular users see only their orders
+      orders = await db
+        .select()
+        .from(ordersTable)
+        .where(eq(ordersTable.userId, Number(req.userId)));
+    }
+
     res.json(orders);
   } catch (error) {
     res.status(500).send(error);
@@ -88,7 +120,7 @@ export async function updateOrder(req: Request, res: Response) {
 
     const [updatedOrder] = await db
       .update(ordersTable)
-      .set(req.body)
+      .set(req.cleanBody)
       .where(eq(ordersTable.id, id))
       .returning();
 
