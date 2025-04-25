@@ -5,8 +5,8 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { usersTable } from "./usersSchema";
-import { productsTable } from "./productsSchema";
+import { usersTable } from "./usersSchema.js";
+import { productsTable } from "./productsSchema.js";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -35,16 +35,14 @@ export const orderItemsTable = pgTable("order_items", {
   price: doublePrecision().notNull(),
 });
 
-export const insertOrderSchema = createInsertSchema(ordersTable).omit({
-  id: true,
-  userId: true,
-  status: true,
-  createdAt: true,
+export const insertOrderSchema = z.object({
+  stripePaymentIntentId: z.string().optional(),
 });
 
-export const insertOrderItemSchema = createInsertSchema(orderItemsTable).omit({
-  id: true,
-  orderId: true,
+export const insertOrderItemSchema = z.object({
+  productId: z.number(),
+  quantity: z.number(),
+  price: z.number(),
 });
 
 export const insertOrderWithItemsSchema = z.object({
